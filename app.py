@@ -1,6 +1,8 @@
+import sys;
 import os, re;
 from flask import Flask, jsonify, request, Response
 from faker import Factory
+
 from twilio.util import TwilioCapability
 import twilio.twiml
 
@@ -51,4 +53,22 @@ def voice():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        host = os.environ['SERVER_HOST']
+    except KeyError:
+        host = '127.0.0.1'
+
+    try:
+        port = int(os.environ['SERVER_PORT'])
+    except KeyError:
+        port = 5000
+
+    context = None
+    try:
+        certfile = os.environ['CERTFILE']
+        keyfile = os.environ['KEYFILE']
+        context = (certfile, keyfile)
+    except KeyError:
+        pass
+
+    app.run(debug=True, host=host, port=port, ssl_context=context)
